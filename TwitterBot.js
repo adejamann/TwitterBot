@@ -35,7 +35,7 @@ Array.prototype.remove = function() {
 };
 
 //url search for the trending tweet on the #GaTech hashtag.
-var mediaArtsSearch = {q:"#GaTech", count: 5, result_type: "trending"};
+var mediaArtsSearch = {q:"#GaTech", count: 5, result_type: "rencent"};
 
 function retweetLatest(){
     T.get('search/tweets', mediaArtsSearch, function (error, data) {
