@@ -3,6 +3,37 @@ var Twit = require('twit');
 //our configuration file.
 var T = new Twit(require('./config'));
 
+
+//Debug
+//Useful for debuging if we don't want to post to Twitter
+var debug = false 
+
+//Wordnik Information
+var WordnikAPI = '';
+var request = require('request');
+var inflection = require('inflection');
+
+
+//Blacklist
+var wordfilter = require('wordfilter');
+
+
+//Helper Function for the array that will pick a random thing
+Array.prototype.pick = function() {
+	return this[Math.floor(Math.random()*this.length)];
+}
+Array.prototype.remove = function() {
+	var what, a = arguments,L = a.length, ax;
+	while (L && this.length) {
+		what = a[--L];
+		while((ax=this.indexOf(what)) !== -1) {
+			this.splice(ax, 1);
+		}
+	}
+	return this;
+
+};
+
 //url search for the trending tweet on the #GaTech hashtag.
 var mediaArtsSearch = {q:"#GaTech", count: 5, result_type: "trending"};
 
