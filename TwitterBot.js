@@ -34,8 +34,8 @@ Array.prototype.remove = function() {
 
 };
 
-//url search for the trending tweet on the #GaTech hashtag.
-var mediaArtsSearch = {q:"#GaTech", count: 5, result_type: "rencent"};
+//url search for the trending tweet on the #graphicdesign hashtag.
+var mediaArtsSearch = {q:"#graphicdesign", count: 5, result_type: "rencent"};
 
 function retweetLatest(){
     T.get('search/tweets', mediaArtsSearch, function (error, data) {
@@ -61,6 +61,22 @@ function retweetLatest(){
 	  	console.log('There was an error: ', error);
       }
 	});     
+}
+
+function likepost() {
+	T.get('search/tweets', {
+		q: 'graphic design', count: 6 
+	},
+	function(err, data, response) {
+		var likedId = data.statuses[0].id_str;
+		T.post('favorites/create', {
+			id: likedId
+		},
+		function(err, data, response) {
+			console.log("You liked a post")
+		});
+		console.log(data);
+	});
 }
 
 //Will retweet something as soon as the program is ran
