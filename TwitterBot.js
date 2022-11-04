@@ -6,6 +6,8 @@ var debug = false
 var WordnikAPIKey = 'd9776ttsyoaffi5hplh66ud2us6ipfuso1thwwe0mv3nvfpxd';
 var request = require('request');
 var inflection = require('inflection');
+var awesome;
+var personal;
 var pre;	// store prebuilt strings here.
 
 //Blacklist
