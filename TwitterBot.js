@@ -28,7 +28,7 @@ var Twit = require('twit');
 // Include configuration file
 var T = new Twit(require('./config.js'));
 
-// Wordnik stuff
+// Wordnik related word search url
 function adjectiveUrl() {
 	return "https://api.wordnik.com/v4/word.json/awesome/relatedWords?useCanonical=false&relationshipTypes=synonym&limitPerRelationshipType=10&api_key=d9776ttsyoaffi5hplh66ud2us6ipfuso1thwwe0mv3nvfpxd";
 }
@@ -204,9 +204,7 @@ function runBot() {
 		}
 	});
 }
-
 // Run the bot
 runBot();
-
 // And recycle every hour
 setInterval(runBot, 1000 * 60 * 60);
