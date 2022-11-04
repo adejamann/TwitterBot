@@ -151,6 +151,7 @@ uploadRandomImage();
 setInterval(uploadRandomImage, 1000 * 60 * 30);
 
 
+//Reply someone's post under #artwork
 function artworkReply() {
 	var artworkSearch = {
 		q: "artwork",
@@ -185,8 +186,10 @@ function artworkReply() {
     });
 }
 
+
+//follows someone posted under #artwork
 function artworkFollow() {
-	var artworkSearch = { //#artworm is searched.
+	var artworkSearch = { //#artwork is searched.
 		q: "artwork",
 		count: 10,
 		result_type: "recent" //looking for recent users.
@@ -214,21 +217,20 @@ function artworkFollow() {
 		}
 	});
 }
-	
+
 
 function runBot() {
 	console.log(" "); // just for legible logs
-	var d = new Date();
+	var d=new Date();
 	var ds = d.toLocaleDateString() + " " + d.toLocaleTimeString();
 	console.log(ds);  // date/time of the request	
 
-	// Get 200 adjective with minimum corpus count of 5,000 (lower numbers = more common words) 
-	request(adjectiveUrl(5000,200), function(err, response, data) {
-		if (err != null) return;		// bail if no data
-		adjective = eval(data);
+	//Request words from Worknik that is related with word awesome
+    request(adjectiveUrl(), function(err, response, data) {
+        if (err != null) return; // Bails if no data
+        adjective = eval(data);
 
 		// Filter out the bad nouns via the wordfilter
-		
 		for (var i = 0; i < adjective.length; i++) {
 			if (wordfilter.blacklisted(adjective[i].word))
 			{
@@ -238,34 +240,46 @@ function runBot() {
 			}				
 		}
 
-		pre = [	
-			"I don't know how anybody can tolerate Prof. " + capitalize(singularize(nouns.pick().word)) + ". What a tool.", 
-			"I'm so behind in my " + singularize(nouns.pick().word) + " class.",
-			"I'm thinking of changing my major to " + capitalize(singularize(nouns.pick().word)) + " Studies.",
-			"Seriously, " + capitalize(singularize(nouns.pick().word)) + " Engineering is ruining my life.",
-			"I can't believe I forgot to bring my " + nouns.pick().word + " to lab again.",
-			"Sooo much homework in this " + capitalize(nouns.pick().word) + " class. I should have taken " + capitalize(nouns.pick().word) + " instead.",
-			"Almost the weekend! Totally amped for the " + nouns.pick().word + " party.",
-			"Seriously I have had enough of Intro to " + capitalize(nouns.pick().word) + ".",
-			"Who's coming to Club " + capitalize(singularize(nouns.pick().word)) + " tonight? I'm DJing along with my bro " + capitalize(nouns.pick().word) + ".",
-			"Missed class again. Too many " + pluralize(nouns.pick().word) + " last night."
-			// etc.			
+		pre = [
+			"I can see all the hard work that you have been pouring into your " + adjective[0].words.pick() + " animation.",
+            "I am impressed by all of the " + adjective[0].words.pick() + " animations that you have created.",
+            "Keep up the " + adjective[0].words.pick() + " work on all of your future animations!",
+            "You are doing " + adjective[0].words.pick() + " on all of your animations and I am rooting for you.",
+            "YES! You are doing " + adjective[0].words.pick() + " work and I'm looking forward to your future projects!",
+            "I usually don't comment, but I wanted to say that you are doing " + adjective[0].words.pick() + " work!",
+            "WOW! Your animation looks so " + adjective[0].words.pick() + "!",
+            "I really like the technique you used in your animation and think you did an " + adjective[0].words.pick() + " job!",
+            "I look forward to seeing " + adjective[0].words.pick() + " animations like yours everyday!",
+            "Your work is simply " + adjective[0].words.pick() + "!",
+            "This animation looks really " + adjective[0].words.pick() + " and I can't wait to see your future projects!",
+            "I love all of the work you do and I just wanted to say that your animations are " + adjective[0].words.pick() + "!",
+            "There's only one word to describe this animation: " + adjective[0].words.pick() + "!",
+            "I love all the intricate detail you put into your" + adjective[0].words.pick() + " animation!",
+            "Your hard work on this " + adjective[0].words.pick() + " animation definitely shows!"
 		];
 		
-		///----- NOW DO THE BOT STUFF
-		var rand = Math.random();
+		// Randomly choose a method to execute
+		var rand = Math.floor(Math.random() * 11);
 
- 		if(rand <= 1.60) {      
-			console.log("-------Tweet something");
-			tweet();
-			
-		} else if (rand <= 0.80) {
-			console.log("-------Tweet something @someone");
-			respondToMention();
-			
+		if (rand <= 2) {
+		console.log("-------Post an image");
+		uploadRandomImage();
+
+		} else if (rand <= 4) {
+		console.log("-------Retweet something in #artwork");
+		retweetLatest();
+
+		} else if (rand <= 6) {
+		console.log("-------Like something if word artwork is in the tweet");
+		likepost();
+
+		} else if (rand <= 8) {
+		console.log("-------Follow someone under #artwork hashtag");
+		artworkFollow();
+
 		} else {
-			console.log("-------Follow someone who @-mentioned us");
-			followAMentioner();
+		console.log("-------Reply someone's post under #artwork hashtag");
+		artworkReply();
 		}
 	});
 }
