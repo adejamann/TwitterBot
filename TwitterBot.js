@@ -18,6 +18,10 @@ var Twit = require('twit');
 // Include configuration file
 var T = new Twit(require('./config.js'));
 
+// Wordnik stuff
+function adjectiveUrl() {
+	return "https://api.wordnik.com/v4/word.json/awesome/relatedWords?useCanonical=false&relationshipTypes=synonym&limitPerRelationshipType=10&api_key=d9776ttsyoaffi5hplh66ud2us6ipfuso1thwwe0mv3nvfpxd";
+}
 
 //Helper Function for the array that will pick a random thing
 Array.prototype.pick = function() {
@@ -32,7 +36,6 @@ Array.prototype.remove = function() {
 		}
 	}
 	return this;
-
 };
 
 
