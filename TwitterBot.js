@@ -29,7 +29,7 @@ var Twit = require('twit');
 // Include configuration file
 var T = new Twit(require('./config.js'));
 
-// Wordnik stuff
+// Wordnik related word search url
 function adjectiveUrl() {
 	return "https://api.wordnik.com/v4/word.json/amazing/relatedWords?useCanonical=false&relationshipTypes=synonym&limitPerRelationshipType=50&api_key=d9776ttsyoaffi5hplh66ud2us6ipfuso1thwwe0mv3nvfpxd";
 }
@@ -149,7 +149,76 @@ const uploadRandomImage = (images) => {
 // Run the uploadRandomImage() method
 uploadRandomImage();
 // Set interval to once an hour
-setInterval(uploadRandomImage, 1000 * 60 * 60);
+setInterval(uploadRandomImage, 1000 * 60 * 30);
+
+
+//Reply someone's post under #artwork
+function artworkReply() {
+	var artworkSearch = {
+		q: "artwork",
+		count: 10,
+		result_type: "recent"
+	};
+	T.get('search/tweets', artworkSearch, function(error, data) {
+		//log out any errors
+		console.log(error, data);
+		if (!error) {
+            // get the id of the tweet to reply
+            var userName = data.statuses[0].user.screen_name;
+            // ...and then we tell Twitter we want to retweet it!
+            T.post('statuses/update', {
+                status: "@" + userName + " " + pre.pick()
+            }, function(err, response) { // Uses the username to create a new replies
+
+
+                if (response) {
+                    console.log('Bot has replied successfully.')
+                }
+                // If there was an error with our Twitter call, we print it out here.
+                if (error) {
+                    console.log('There was an error:', error);
+                }
+            })
+        }
+        // if search request was an error:
+        else {
+            console.log('There was an error with your hashtag search:', error);
+        }
+    });
+}
+
+
+//follows someone posted under #artwork
+function artworkFollow() {
+	var artworkSearch = { //#artwork is searched.
+		q: "artwork",
+		count: 10,
+		result_type: "recent" //looking for recent users.
+	};
+	T.get('search/tweets', artworkSearch, function(error, data) { 
+		if (error !== null) { //checks for error
+			console.log('There is an error: ', err);
+		  }
+		  else {
+		  	var sn = reply.pick().user.screen_name;
+			if (debug) 
+				console.log(sn);
+			else {
+				//Now follow that user
+				T.post('friendships/create', {
+					screen_name
+                }, function(err, response) {
+                    if (err) {
+                        console.log('There was an error: ', err);
+                    } else {
+                        console.log(screen_name, ': Following'); //successfully followed!
+                    }
+				});
+			}
+		}
+	});
+}
+
 
 function runBot() {
 	console.log(" "); // just for legible logs
@@ -157,12 +226,13 @@ function runBot() {
 	var ds = d.toLocaleDateString() + " " + d.toLocaleTimeString();
 	console.log(ds);  // date/time of the request	
 
-	//Pulls adjectives from the Wordnik Api that are synonyms for the word good
-	request(adjectiveUrl(), function(err, response, data) {
-		if (err != null) return;// bails if there is no data
-		adjective = eval(data);
 
-		// Filter out the bad adejectives via the wordfilter
+	//Request words from Worknik that is related with word awesome
+    request(adjectiveUrl(), function(err, response, data) {
+        if (err != null) return; // Bails if no data
+        adjective = eval(data);
+
+		// Filter out the bad nouns via the wordfilter
 		for (var i = 0; i < adjective.length; i++) {
 			if (wordfilter.blacklisted(adjective[i].word))
 			{
@@ -173,7 +243,7 @@ function runBot() {
 		}
 
 		pre = [
-			
+
 			"This piece of artwork is so " + adjective[0].words.pick() + ".", 
 			"This is so " + adjective[0].words.pick() + " to me.",
 			" I really love how " + adjective[0].words.pick() + " this is.",
@@ -185,28 +255,35 @@ function runBot() {
 			"You are doing such a " + adjective[0].words.pick() + "job on your artwork.",
 			"keep up the " + adjective[0].words.pick() + " work."
 			// etc.			
+
 		];
 		
-		///----- NOW DO THE BOT STUFF
-		var rand = Math.random();
+		// Randomly choose a method to execute
+		var rand = Math.floor(Math.random() * 11);
 
- 		if(rand <= 1.60) {      
-			console.log("-------Tweet something");
-			tweet();
-			
-		} else if (rand <= 0.80) {
-			console.log("-------Tweet something @someone");
-			respondToMention();
-			
+		if (rand <= 2) {
+		console.log("-------Post an image");
+		uploadRandomImage();
+
+		} else if (rand <= 4) {
+		console.log("-------Retweet something in #artwork");
+		retweetLatest();
+
+		} else if (rand <= 6) {
+		console.log("-------Like something if word artwork is in the tweet");
+		likepost();
+
+		} else if (rand <= 8) {
+		console.log("-------Follow someone under #artwork hashtag");
+		artworkFollow();
+
 		} else {
-			console.log("-------Follow someone who @-mentioned us");
-			followAMentioner();
+		console.log("-------Reply someone's post under #artwork hashtag");
+		artworkReply();
 		}
 	});
 }
-
 // Run the bot
 runBot();
-
 // And recycle every hour
-setInterval(runBot, 1000 * 60 * 60);
+setInterval(runBot, 1000 * 60 * 30);
