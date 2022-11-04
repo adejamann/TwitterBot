@@ -15,7 +15,7 @@ var WordnikAPIKey = 'd9776ttsyoaffi5hplh66ud2us6ipfuso1thwwe0mv3nvfpxd';
 var request = require('request');
 var inflection = require('inflection');
 var awesome;
-var personal;
+
 var pre;	// store prebuilt strings here.
 
 //Blacklist
@@ -173,7 +173,7 @@ function runBot() {
 		}
 
 		pre = [
-			"Dude, I haven't even started this essay on " + pluralize(nouns.pick().word) + " yet.",
+			
 			"I don't know how anybody can tolerate Prof. " + capitalize(singularize(nouns.pick().word)) + ". What a tool.", 
 			"I'm so behind in my " + singularize(nouns.pick().word) + " class.",
 			"I'm thinking of changing my major to " + capitalize(singularize(nouns.pick().word)) + " Studies.",
