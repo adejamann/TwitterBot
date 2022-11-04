@@ -179,6 +179,38 @@ function artworkReply() {
         }
     });
 }
+
+function artworkFollow() {
+	var artworkSearch = { //#artworm is searched.
+		q: "artwork",
+		count: 10,
+		result_type: "recent" //looking for recent users.
+	};
+	T.get('search/tweets', artworkSearch, function(error, data) { 
+		f (err !== null) { //checks for error
+			console.log('There is an error: ', err);
+		  }
+		  else {
+		  	var sn = reply.pick().user.screen_name;
+			if (debug) 
+				console.log(sn);
+			else {
+				//Now follow that user
+				T.post('friendships/create', {
+					screen_name
+                }, function(err, response) {
+                    if (err) {
+                        console.log('There was an error: ', err);
+                    } else {
+                        console.log(screen_name, ': Following'); //successfully followed!
+                    }
+				});
+			}
+		}
+	});
+}
+		
+		
 	
 // Run the uploadRandomImage() method
 uploadRandomImage();
