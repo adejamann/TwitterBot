@@ -137,7 +137,8 @@ const uploadRandomImage = (images) => {
 }
 // Run the uploadRandomImage() method
 uploadRandomImage();
-
+// Set interval to once an hour
+setInterval(uploadRandomImage, 1000 * 60 * 60);
 
 function runBot() {
 	console.log(" "); // just for legible logs
