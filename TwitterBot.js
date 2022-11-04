@@ -165,12 +165,12 @@ function artworkReply() {
             var userName = data.statuses[0].user.screen_name;
             // ...and then we tell Twitter we want to retweet it!
             T.post('statuses/update', {
-                status: "@" + userName + " " + personal.pick()
+                status: "@" + userName + " " + pre.pick()
             }, function(err, response) { // Uses the username to create a new replies
 
 
                 if (response) {
-                    console.log('Success! Check your bot, it should have replied.')
+                    console.log('Bot has replied successfully.')
                 }
                 // If there was an error with our Twitter call, we print it out here.
                 if (error) {
@@ -192,7 +192,7 @@ function artworkFollow() {
 		result_type: "recent" //looking for recent users.
 	};
 	T.get('search/tweets', artworkSearch, function(error, data) { 
-		f (err !== null) { //checks for error
+		if (error !== null) { //checks for error
 			console.log('There is an error: ', err);
 		  }
 		  else {
@@ -218,7 +218,7 @@ function artworkFollow() {
 
 function runBot() {
 	console.log(" "); // just for legible logs
-	var d=new Date();
+	var d = new Date();
 	var ds = d.toLocaleDateString() + " " + d.toLocaleTimeString();
 	console.log(ds);  // date/time of the request	
 
@@ -238,8 +238,7 @@ function runBot() {
 			}				
 		}
 
-		pre = [
-			
+		pre = [	
 			"I don't know how anybody can tolerate Prof. " + capitalize(singularize(nouns.pick().word)) + ". What a tool.", 
 			"I'm so behind in my " + singularize(nouns.pick().word) + " class.",
 			"I'm thinking of changing my major to " + capitalize(singularize(nouns.pick().word)) + " Studies.",
@@ -273,4 +272,4 @@ function runBot() {
 // Run the bot
 runBot();
 // And recycle every hour
-setInterval(runBot, 1000 * 60 * 60);
+setInterval(runBot, 1000 * 60 * 30);
