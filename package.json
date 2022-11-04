@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "twit": "^2.2.11"
+  },
+  "name": "testtwitbot",
+  "description": "This bot retweets the latest tweet using the \"#graphic design\" hashtag. It attempts to retweet once per hour.",
+  "version": "1.0.0",
+  "main": "this is a test for twit bot",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "twit",
+    "bot"
+  ],
+  "author": "jessie xu",
+  "license": "ISC"
+}
