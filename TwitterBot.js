@@ -8,10 +8,17 @@ var T = new Twit(require('./config'));
 //Useful for debuging if we don't want to post to Twitter
 var debug = false 
 
+//wordnik stuff
+var WordnikAPIKey = 'd9776ttsyoaffi5hplh66ud2us6ipfuso1thwwe0mv3nvfpxd';
+var request = require('request');
+var inflection = require('inflection');
+
 //Wordnik Information
 var WordnikAPI = '';
 var request = require('request');
 var inflection = require('inflection');
+
+
 
 
 //Blacklist
