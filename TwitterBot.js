@@ -1,3 +1,11 @@
+/**
+Purpose of our Twitterbot: We have a few function, post, like, and upload images. We are also using
+Wordnik API to interact with users on Twitter.
+Post: We uploud random images related to #artwork.
+Like: Likes posts with the word artwork mentioned.
+retweet: posts are retweeted when there is #artwork.
+uploads: random images are pulled out and are posted.
+*/
 //Debug
 //Useful for debuging if we don't want to post to Twitter
 var debug = false 
