@@ -18,6 +18,7 @@ var awesome;
 
 var pre;	// store prebuilt strings here.
 
+
 //Blacklist
 var wordfilter = require('wordfilter');
 
@@ -30,7 +31,7 @@ var T = new Twit(require('./config.js'));
 
 // Wordnik stuff
 function adjectiveUrl() {
-	return "https://api.wordnik.com/v4/word.json/awesome/relatedWords?useCanonical=false&relationshipTypes=synonym&limitPerRelationshipType=10&api_key=d9776ttsyoaffi5hplh66ud2us6ipfuso1thwwe0mv3nvfpxd";
+	return "https://api.wordnik.com/v4/word.json/amazing/relatedWords?useCanonical=false&relationshipTypes=synonym&limitPerRelationshipType=50&api_key=d9776ttsyoaffi5hplh66ud2us6ipfuso1thwwe0mv3nvfpxd";
 }
 
 //Helper Function for the array that will pick a random thing
@@ -156,13 +157,12 @@ function runBot() {
 	var ds = d.toLocaleDateString() + " " + d.toLocaleTimeString();
 	console.log(ds);  // date/time of the request	
 
-	// Get 200 adjective with minimum corpus count of 5,000 (lower numbers = more common words) 
-	request(adjectiveUrl(5000,200), function(err, response, data) {
-		if (err != null) return;		// bail if no data
+	//Pulls adjectives from the Wordnik Api that are synonyms for the word good
+	request(adjectiveUrl(), function(err, response, data) {
+		if (err != null) return;// bails if there is no data
 		adjective = eval(data);
 
-		// Filter out the bad nouns via the wordfilter
-		
+		// Filter out the bad adejectives via the wordfilter
 		for (var i = 0; i < adjective.length; i++) {
 			if (wordfilter.blacklisted(adjective[i].word))
 			{
@@ -174,16 +174,16 @@ function runBot() {
 
 		pre = [
 			
-			"I don't know how anybody can tolerate Prof. " + capitalize(singularize(nouns.pick().word)) + ". What a tool.", 
-			"I'm so behind in my " + singularize(nouns.pick().word) + " class.",
-			"I'm thinking of changing my major to " + capitalize(singularize(nouns.pick().word)) + " Studies.",
-			"Seriously, " + capitalize(singularize(nouns.pick().word)) + " Engineering is ruining my life.",
-			"I can't believe I forgot to bring my " + nouns.pick().word + " to lab again.",
-			"Sooo much homework in this " + capitalize(nouns.pick().word) + " class. I should have taken " + capitalize(nouns.pick().word) + " instead.",
-			"Almost the weekend! Totally amped for the " + nouns.pick().word + " party.",
-			"Seriously I have had enough of Intro to " + capitalize(nouns.pick().word) + ".",
-			"Who's coming to Club " + capitalize(singularize(nouns.pick().word)) + " tonight? I'm DJing along with my bro " + capitalize(nouns.pick().word) + ".",
-			"Missed class again. Too many " + pluralize(nouns.pick().word) + " last night."
+			"This piece of artwork is so " + adjective[0].words.pick() + ".", 
+			"This is so " + adjective[0].words.pick() + " to me.",
+			" I really love how " + adjective[0].words.pick() + " this is.",
+			"I think this piece is so " + adjective[0].words.pick() +"." ,
+			"You did a " + adjective[0].words.pick() + " job.",
+			"Your art is " + adjective[0].words.pick() + ".",
+			"I really like the technique you did, it makes it so " + adjective[0].words.pick() + ".",
+			"Your hard work really makes this piece so " + adjective[0].words.pick() + ".",
+			"You are doing such a " + adjective[0].words.pick() + "job on your artwork.",
+			"keep up the " + adjective[0].words.pick() + " work."
 			// etc.			
 		];
 		
