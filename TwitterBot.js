@@ -34,23 +34,29 @@ Array.prototype.remove = function() {
 
 };
 
-//url search for the trending tweet on the #graphicdesign hashtag.
-var mediaArtsSearch = {q:"#graphicdesign", count: 5, result_type: "rencent"};
 
-function retweetLatest(){
-    T.get('search/tweets', mediaArtsSearch, function (error, data) {
-        // log out any errors and responses
+// This is the URL of a search for the latest tweets on the '#graphic design' hashtag.
+var artworkSearch = {
+    q: "#artwork", 
+    count: 10, 
+    result_type: "recent",
+}; 
+
+// This function finds the latest tweet with the #artwork hashtag, and retweets it.
+function retweetLatest() {
+	T.get('search/tweets', artworkSearch, function (error, data) {
+	  // log out any errors and responses
 	  console.log(error, data);
-	  // If our search request to the server 
+	  // If our search request to the server had no errors...
 	  if (!error) {
-	  	// 
+	  	// ...then we grab the ID of the tweet we want to retweet...
 		var retweetId = data.statuses[0].id_str;
-		//retweets it
+		// ...and then we tell Twitter we want to retweet it!
 		T.post('statuses/retweet/' + retweetId, { }, function (error, response) {
 			if (response) {
-				console.log('Success! Your bot tweeted something.')
+				console.log('Success! Check your bot, it should have retweeted something.')
 			}
-			// prints out error if there is error
+			// If there was an error with our Twitter call, we print it out here.
 			if (error) {
 				console.log('There was an error with Twitter:', error);
 			}
@@ -58,10 +64,14 @@ function retweetLatest(){
 	  }
 	  // However, if our original search request had an error, we want to print it out here.
 	  else {
-	  	console.log('There was an error: ', error);
-      }
-	});     
+	  	console.log('There was an error with your hashtag search:', error);
+	  }
+	});
 }
+retweetLatest();
+//Retweet every hour
+setInterval(retweetLatest, 1000 * 60 * 60);
+
 
 function likepost() {
 	T.get('search/tweets', {
@@ -79,9 +89,46 @@ function likepost() {
 	});
 }
 
-//Will retweet something as soon as the program is ran
-retweetLatest();
 
-// ...and then every hour after that.It will retweet something every 30 minutes
-// 1000 mil seconds --> 60 seconds---> 30 minutes
-setInterval(retweetLatest, 1000 * 60 * 30);
+//Tweet random graphic design images from images folder
+//Generates an image from 
+const randomFromArray = (images) => {
+	return images[Math.floor(Math.random() * images.length)];
+  } 
+// Pull out image from image.js
+const uploadRandomImage = (images) => {
+	console.log('opening an image...');
+	const randomImage = randomFromArray(images);
+	const imagePath = path.join(__dirname, '/images/' + randomImage.file);
+	const imageData = fs.readFileSync(imagePath, {encoding: 'base64'});
+	// Upload image to post
+	T.post('media/upload', {media_data: imageData}, (err, data, response) => {
+		console.log('uploading an image...');
+		// Print out error if an error occurs
+		if (err){
+			console.log('error:', err);
+		} else {
+			console.log('adding description...');
+			const image = data;
+			//Post the random image
+			T.post('media/metadata/create', {
+				media_id: data.media_id_string,
+				alt_text: {
+					text: randomImage.altText
+				}            
+			}, (err, data, response) => {
+				console.log('tweeting...');
+				T.post('statuses/update', {
+					status: randomImage.text,
+					media_ids: new Array(image.media_id_string)
+				}, (err, data, response) => {
+					if (err){
+						console.log('error:', err);
+					}
+				});
+			});
+		}
+	});
+}
+// Run the uploadRandomImage() method
+uploadRandomImage();
