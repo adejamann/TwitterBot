@@ -156,18 +156,18 @@ function runBot() {
 	var ds = d.toLocaleDateString() + " " + d.toLocaleTimeString();
 	console.log(ds);  // date/time of the request	
 
-	// Get 200 nouns with minimum corpus count of 5,000 (lower numbers = more common words) 
-	request(nounUrl(5000,200), function(err, response, data) {
+	// Get 200 adjective with minimum corpus count of 5,000 (lower numbers = more common words) 
+	request(adjectiveUrl(5000,200), function(err, response, data) {
 		if (err != null) return;		// bail if no data
-		nouns = eval(data);
+		adjective = eval(data);
 
 		// Filter out the bad nouns via the wordfilter
 		
-		for (var i = 0; i < nouns.length; i++) {
-			if (wordfilter.blacklisted(nouns[i].word))
+		for (var i = 0; i < adjective.length; i++) {
+			if (wordfilter.blacklisted(adjective[i].word))
 			{
-				console.log("Blacklisted: " + nouns[i].word);
-				nouns.remove(nouns[i]);
+				console.log("Blacklisted: " + adjective[i].word);
+				adjective.remove(adjective[i]);
 				i--;
 			}				
 		}
