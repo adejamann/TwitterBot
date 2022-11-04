@@ -1,9 +1,3 @@
-//twitter library.
-var Twit = require('twit');
-//our configuration file.
-var T = new Twit(require('./config'));
-
-
 //Debug
 //Useful for debuging if we don't want to post to Twitter
 var debug = false 
@@ -12,17 +6,17 @@ var debug = false
 var WordnikAPIKey = 'd9776ttsyoaffi5hplh66ud2us6ipfuso1thwwe0mv3nvfpxd';
 var request = require('request');
 var inflection = require('inflection');
-
-//Wordnik Information
-var WordnikAPI = '';
-var request = require('request');
-var inflection = require('inflection');
-
-
-
+var pre;	// store prebuilt strings here.
 
 //Blacklist
 var wordfilter = require('wordfilter');
+
+// Twitter Essentials
+// Twitter Library
+var Twit = require('twit');
+
+// Include configuration file
+var T = new Twit(require('./config.js'));
 
 
 //Helper Function for the array that will pick a random thing
@@ -41,23 +35,28 @@ Array.prototype.remove = function() {
 
 };
 
-//url search for the trending tweet on the #graphicdesign hashtag.
-var mediaArtsSearch = {q:"#graphicdesign", count: 5, result_type: "rencent"};
 
-function retweetLatest(){
-    T.get('search/tweets', mediaArtsSearch, function (error, data) {
-        // log out any errors and responses
+// This is the URL of a search for the latest tweets on the '#artwork' hashtag.
+var artworkSearch = {
+    q: "#artwork", 
+    count: 10, 
+    result_type: "recent",
+}; 
+// This function finds the latest tweet with the #artwork hashtag, and retweets it.
+function retweetLatest() {
+	T.get('search/tweets', artworkSearch, function (error, data) {
+	  // log out any errors and responses
 	  console.log(error, data);
-	  // If our search request to the server 
+	  // If our search request to the server had no errors...
 	  if (!error) {
-	  	// 
+	  	// ...then we grab the ID of the tweet we want to retweet...
 		var retweetId = data.statuses[0].id_str;
-		//retweets it
+		// ...and then we tell Twitter we want to retweet it!
 		T.post('statuses/retweet/' + retweetId, { }, function (error, response) {
 			if (response) {
-				console.log('Success! Your bot tweeted something.')
+				console.log('Success! Check your bot, it should have retweeted something.')
 			}
-			// prints out error if there is error
+			// If there was an error with our Twitter call, we print it out here.
 			if (error) {
 				console.log('There was an error with Twitter:', error);
 			}
@@ -65,14 +64,21 @@ function retweetLatest(){
 	  }
 	  // However, if our original search request had an error, we want to print it out here.
 	  else {
-	  	console.log('There was an error: ', error);
-      }
-	});     
+	  	console.log('There was an error with your hashtag search:', error);
+	  }
+	});
 }
+//Will retweet something as soon as the program is ran
+retweetLatest();
+// ...and then every hour after that.It will retweet something every 30 minutes
+// 1000 mil seconds --> 60 seconds---> 30 minutes
+setInterval(retweetLatest, 1000 * 60 * 30);
 
+
+// Like posts under #artwork hashtag
 function likepost() {
 	T.get('search/tweets', {
-		q: 'graphic design', count: 6 
+		q: 'artwork', count: 5 
 	},
 	function(err, data, response) {
 		var likedId = data.statuses[0].id_str;
@@ -86,9 +92,64 @@ function likepost() {
 	});
 }
 
-//Will retweet something as soon as the program is ran
-retweetLatest();
 
-// ...and then every hour after that.It will retweet something every 30 minutes
-// 1000 mil seconds --> 60 seconds---> 30 minutes
-setInterval(retweetLatest, 1000 * 60 * 30);
+function runBot() {
+	console.log(" "); // just for legible logs
+	var d=new Date();
+	var ds = d.toLocaleDateString() + " " + d.toLocaleTimeString();
+	console.log(ds);  // date/time of the request	
+
+	// Get 200 nouns with minimum corpus count of 5,000 (lower numbers = more common words) 
+	request(nounUrl(5000,200), function(err, response, data) {
+		if (err != null) return;		// bail if no data
+		nouns = eval(data);
+
+		// Filter out the bad nouns via the wordfilter
+		
+		for (var i = 0; i < nouns.length; i++) {
+			if (wordfilter.blacklisted(nouns[i].word))
+			{
+				console.log("Blacklisted: " + nouns[i].word);
+				nouns.remove(nouns[i]);
+				i--;
+			}				
+		}
+
+		pre = [
+			"Dude, I haven't even started this essay on " + pluralize(nouns.pick().word) + " yet.",
+			"I don't know how anybody can tolerate Prof. " + capitalize(singularize(nouns.pick().word)) + ". What a tool.", 
+			"I'm so behind in my " + singularize(nouns.pick().word) + " class.",
+			"I'm thinking of changing my major to " + capitalize(singularize(nouns.pick().word)) + " Studies.",
+			"Seriously, " + capitalize(singularize(nouns.pick().word)) + " Engineering is ruining my life.",
+			"I can't believe I forgot to bring my " + nouns.pick().word + " to lab again.",
+			"Sooo much homework in this " + capitalize(nouns.pick().word) + " class. I should have taken " + capitalize(nouns.pick().word) + " instead.",
+			"Almost the weekend! Totally amped for the " + nouns.pick().word + " party.",
+			"Seriously I have had enough of Intro to " + capitalize(nouns.pick().word) + ".",
+			"Who's coming to Club " + capitalize(singularize(nouns.pick().word)) + " tonight? I'm DJing along with my bro " + capitalize(nouns.pick().word) + ".",
+			"Missed class again. Too many " + pluralize(nouns.pick().word) + " last night."
+			// etc.			
+		];
+		
+		///----- NOW DO THE BOT STUFF
+		var rand = Math.random();
+
+ 		if(rand <= 1.60) {      
+			console.log("-------Tweet something");
+			tweet();
+			
+		} else if (rand <= 0.80) {
+			console.log("-------Tweet something @someone");
+			respondToMention();
+			
+		} else {
+			console.log("-------Follow someone who @-mentioned us");
+			followAMentioner();
+		}
+	});
+}
+
+// Run the bot
+runBot();
+
+// And recycle every hour
+setInterval(runBot, 1000 * 60 * 60);
