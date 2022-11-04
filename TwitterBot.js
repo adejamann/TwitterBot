@@ -145,6 +145,41 @@ const uploadRandomImage = (images) => {
 		}
 	});
 }
+
+function artworkReply() {
+	var artworkSearch = {
+		q: "artwork",
+		count: 10,
+		result_type: "recent"
+	};
+	T.get('search/tweets', artworkSearch, function(error, data) {
+		//log out any errors
+		console.log(error, data);
+		if (!error) {
+            // get the id of the tweet to reply
+            var userName = data.statuses[0].user.screen_name;
+            // ...and then we tell Twitter we want to retweet it!
+            T.post('statuses/update', {
+                status: "@" + userName + " " + personal.pick()
+            }, function(err, response) { // Uses the username to create a new replies
+
+
+                if (response) {
+                    console.log('Success! Check your bot, it should have replied.')
+                }
+                // If there was an error with our Twitter call, we print it out here.
+                if (error) {
+                    console.log('There was an error:', error);
+                }
+            })
+        }
+        // if search request was an error:
+        else {
+            console.log('There was an error with your hashtag search:', error);
+        }
+    });
+}
+	
 // Run the uploadRandomImage() method
 uploadRandomImage();
 // Set interval to once an hour
