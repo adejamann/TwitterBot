@@ -30,8 +30,6 @@ var Twit = require('twit');
 // Include configuration file
 var T = new Twit(require('./config.js'));
 
-const fs = require('fs');
-
 // Wordnik related word search url
 function adjectiveUrl() {
 	return "https://api.wordnik.com/v4/word.json/amazing/relatedWords?useCanonical=false&relationshipTypes=synonym&limitPerRelationshipType=50&api_key=d9776ttsyoaffi5hplh66ud2us6ipfuso1thwwe0mv3nvfpxd";
@@ -51,52 +49,6 @@ Array.prototype.remove = function() {
 	}
 	return this;
 };
-
-
-//Tweet random graphic design images from images folder
-//Generates an image from 
-const randomFromArray = (images) => {
-	return images[Math.floor(Math.random() * images.length)];
-  } 
-// Pull out image from image.js
-const uploadRandomImage = (images) => {
-	console.log('opening an image...');
-	const randomImage = randomFromArray(images);
-	const imagePath = path.join(__dirname, '/images/' + randomImage.file);
-	const imageData = fs.readFileSync(imagePath, {encoding: 'base64'});
-	// Upload image to post
-	T.post('media/upload', {media_data: imageData}, (err, data, response) => {
-		console.log('uploading an image...');
-		// Print out error if an error occurs
-		if (err){
-			console.log('error:', err);
-		} else {
-			console.log('adding description...');
-			const image = data;
-			//Post the random image
-			T.post('media/metadata/create', {
-				media_id: data.media_id_string,
-				alt_text: {
-					text: randomImage.altText
-				}            
-			}, (err, data, response) => {
-				console.log('tweeting...');
-				T.post('statuses/update', {
-					status: randomImage.text,
-					media_ids: new Array(image.media_id_string)
-				}, (err, data, response) => {
-					if (err){
-						console.log('error:', err);
-					}
-				});
-			});
-		}
-	});
-}
-// Run the uploadRandomImage() method
-uploadRandomImage();
-// Set interval to once an hour
-setInterval(uploadRandomImage, 1000 * 60 * 60);
 
 
 // This is the URL of a search for the latest tweets on the '#artwork' hashtag.
@@ -215,32 +167,30 @@ function artworkFollow() {
 		count: 10,
 		result_type: "recent" //looking for recent users.
 	};
-	T.get('search/tweets', artwork, function(error, data) {
-        // If there is no error, proceed
-        if (!error) {
-
-            for (let i = 0; i < data.statuses.length; i++) {
-                // Get the screen_name 
-                let screen_name = data.statuses[i].user.screen_name;
-
-
-                // Follow that user
-                T.post('friendships/create', {
-                    screen_name
-                }, function(err, response) {
-                    if (err) {
-                        console.log('There was an error with Twitter: ', err);
+	T.get('search/tweets', artworkSearch, function(error, data) { 
+		if (error !== null) { //checks for error
+			console.log('There is an error: ', error);
+		  }
+		  else {
+		  	var sn = reply.pick().user.screen_name;
+			if (debug) 
+				console.log(sn);
+			else {
+				//Now follow that user
+				T.post('friendships/create', {
+					screen_name: sn 
+                }, function(error, response) {
+                    if (error) {
+                        console.log('There was an error: ', error);
                     } else {
-                        console.log(screen_name, ': Following'); //successfully followed!
+                        console.log(screen_name, ': Following' + sn); //successfully followed!
                     }
-                });
-            }
-        } else {
-            console.log('There was an error: ', error);
-        }
-    })
+				});
+			}
+		}
+	});
 }
-	
+
 
 function runBot() {
 	console.log(" "); // just for legible logs
@@ -291,16 +241,16 @@ function runBot() {
 		var rand = Math.floor(Math.random() * 11);
 
 		if (rand <= 2) {
-		console.log("-------Post an image");
-		artworkFollow();
+		console.log("-------Post a tweet");
+		tweet();
 
 		} else if (rand <= 4) {
 		console.log("-------Retweet something in #artwork");
-		artworkFollow();
+		retweetLatest();
 
 		} else if (rand <= 6) {
 		console.log("-------Like something if word artwork is in the tweet");
-		artworkFollow();
+		likepost();
 
 		} else if (rand <= 8) {
 		console.log("-------Follow someone under #artwork hashtag");
@@ -308,7 +258,7 @@ function runBot() {
 
 		} else {
 		console.log("-------Reply someone's post under #artwork hashtag");
-		artworkFollow();
+		artworkReply();
 		}
 	});
 }
