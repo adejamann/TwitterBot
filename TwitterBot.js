@@ -167,7 +167,7 @@ function artworkFollow() {
 		count: 10,
 		result_type: "recent" //looking for recent users.
 	};
-	T.get('search/tweets', animationSearch, function(error, data) {
+	T.get('search/tweets', artwork, function(error, data) {
         // If there is no error, proceed
         if (!error) {
 
