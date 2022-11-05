@@ -82,11 +82,7 @@ function retweetLatest() {
 	  }
 	});
 }
-//Will retweet something as soon as the program is ran
-retweetLatest();
-// ...and then every hour after that.It will retweet something every 30 minutes
-// 1000 mil seconds --> 60 seconds---> 30 minutes
-setInterval(retweetLatest, 1000 * 60 * 30);
+
 
 
 // Like posts under #artwork hashtag
