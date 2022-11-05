@@ -30,7 +30,6 @@ var Twit = require('twit');
 // Include configuration file
 var T = new Twit(require('./config.js'));
 
-const fs = require('fs');
 
 // Wordnik related word search url
 function adjectiveUrl() {
@@ -58,45 +57,7 @@ Array.prototype.remove = function() {
 const randomFromArray = (images) => {
 	return images[Math.floor(Math.random() * images.length)];
   } 
-// Pull out image from image.js
-const uploadRandomImage = (images) => {
-	console.log('opening an image...');
-	const randomImage = randomFromArray(images);
-	const imagePath = path.join(__dirname, '/images/' + randomImage.file);
-	const imageData = fs.readFileSync(imagePath, {encoding: 'base64'});
-	// Upload image to post
-	T.post('media/upload', {media_data: imageData}, (err, data, response) => {
-		console.log('uploading an image...');
-		// Print out error if an error occurs
-		if (err){
-			console.log('error:', err);
-		} else {
-			console.log('adding description...');
-			const image = data;
-			//Post the random image
-			T.post('media/metadata/create', {
-				media_id: data.media_id_string,
-				alt_text: {
-					text: randomImage.altText
-				}            
-			}, (err, data, response) => {
-				console.log('tweeting...');
-				T.post('statuses/update', {
-					status: randomImage.text,
-					media_ids: new Array(image.media_id_string)
-				}, (err, data, response) => {
-					if (err){
-						console.log('error:', err);
-					}
-				});
-			});
-		}
-	});
-}
-// Run the uploadRandomImage() method
-uploadRandomImage();
-// Set interval to once an hour
-setInterval(uploadRandomImage, 1000 * 60 * 30);
+
 
 
 // This is the URL of a search for the latest tweets on the '#artwork' hashtag.
@@ -208,36 +169,6 @@ function artworkReply() {
 }
 
 
-//follows someone posted under #artwork
-function artworkFollow() {
-	var artworkSearch = { //#artwork is searched.
-		q: "artwork",
-		count: 10,
-		result_type: "recent" //looking for recent users.
-	};
-	T.get('search/tweets', artworkSearch, function(error, data) { 
-		if (error !== null) { //checks for error
-			console.log('There is an error: ', error);
-		  }
-		  else {
-		  	var sn = reply.pick().user.screen_name;
-			if (debug) 
-				console.log(sn);
-			else {
-				//Now follow that user
-				T.post('friendships/create', {
-					screen_name: sn 
-                }, function(error, response) {
-                    if (error) {
-                        console.log('There was an error: ', error);
-                    } else {
-                        console.log(screen_name, ': Following' + sn); //successfully followed!
-                    }
-				});
-			}
-		}
-	});
-}
 
 
 function runBot() {
@@ -299,10 +230,6 @@ function runBot() {
 		} else if (rand <= 6) {
 		console.log("-------Like something if word artwork is in the tweet");
 		likepost();
-
-		} else if (rand <= 8) {
-		console.log("-------Follow someone under #artwork hashtag");
-		artworkFollow();
 
 		} else {
 		console.log("-------Reply someone's post under #artwork hashtag");
