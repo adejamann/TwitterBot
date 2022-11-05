@@ -40,6 +40,7 @@ function adjectiveUrl() {
 Array.prototype.pick = function() {
 	return this[Math.floor(Math.random()*this.length)];
 }
+//Helper method that will remove an element in the array
 Array.prototype.remove = function() {
 	var what, a = arguments,L = a.length, ax;
 	while (L && this.length) {
@@ -50,14 +51,6 @@ Array.prototype.remove = function() {
 	}
 	return this;
 };
-
-
-//Tweet random graphic design images from images folder
-//Generates an image from 
-const randomFromArray = (images) => {
-	return images[Math.floor(Math.random() * images.length)];
-  } 
-
 
 
 // This is the URL of a search for the latest tweets on the '#artwork' hashtag.
@@ -100,6 +93,7 @@ function likepost() {
 	T.get('search/tweets', {
 		q: 'artwork', count: 5 
 	},
+	// Likes a post
 	function(err, data, response) {
 		var likedId = data.statuses[0].id_str;
 		T.post('favorites/create', {
@@ -130,7 +124,6 @@ function tweet() {
             }
         });
 }
-
 
 
 //Reply someone's post under #artwork
@@ -167,8 +160,6 @@ function artworkReply() {
         }
     });
 }
-
-
 
 
 function runBot() {
