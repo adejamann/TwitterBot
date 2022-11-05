@@ -1,8 +1,8 @@
 //Information for logining into the bot
 module.exports = {
-    consumer_key:         'Vm6yNHL4y0CkBcOlEKkxEN8ZV',
-    consumer_secret:      'bH6LfGV95kkcOqTcDr1KsJt8EAkFjDRS640Kq1Zu8q7XH07y0L',
-    access_token:         '1587170007678599169-zwJMEMPbm1jmvSt8lZr8ktFtmcAf4N',
-    access_token_secret:  'YdWPPxB2KuJITgDpKtxO1NyfsfM20Yf8ieSlYIIY6XxgX'
+    consumer_key:         'tqg07dm7Y5mzPbPkim1JsMN8T',
+    consumer_secret:      'oQ4P5S6OLTCvprWabQ9mtk7w9zumQFSY0DCq9jsodK4W47xtho',
+    access_token:         '1587170007678599169-ZqtiYWTUTRdBZItbYlZFjPSNptibnN',
+    access_token_secret:  'x2GjiKMpcP0fighfdMVVBSfxyTGskvV0tiItjptovF7BP'
   }
   
