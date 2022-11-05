@@ -30,6 +30,8 @@ var Twit = require('twit');
 // Include configuration file
 var T = new Twit(require('./config.js'));
 
+const fs = require('fs');
+
 // Wordnik related word search url
 function adjectiveUrl() {
 	return "https://api.wordnik.com/v4/word.json/amazing/relatedWords?useCanonical=false&relationshipTypes=synonym&limitPerRelationshipType=50&api_key=d9776ttsyoaffi5hplh66ud2us6ipfuso1thwwe0mv3nvfpxd";
@@ -49,6 +51,52 @@ Array.prototype.remove = function() {
 	}
 	return this;
 };
+
+
+//Tweet random graphic design images from images folder
+//Generates an image from 
+const randomFromArray = (images) => {
+	return images[Math.floor(Math.random() * images.length)];
+  } 
+// Pull out image from image.js
+const uploadRandomImage = (images) => {
+	console.log('opening an image...');
+	const randomImage = randomFromArray(images);
+	const imagePath = path.join(__dirname, '/images/' + randomImage.file);
+	const imageData = fs.readFileSync(imagePath, {encoding: 'base64'});
+	// Upload image to post
+	T.post('media/upload', {media_data: imageData}, (err, data, response) => {
+		console.log('uploading an image...');
+		// Print out error if an error occurs
+		if (err){
+			console.log('error:', err);
+		} else {
+			console.log('adding description...');
+			const image = data;
+			//Post the random image
+			T.post('media/metadata/create', {
+				media_id: data.media_id_string,
+				alt_text: {
+					text: randomImage.altText
+				}            
+			}, (err, data, response) => {
+				console.log('tweeting...');
+				T.post('statuses/update', {
+					status: randomImage.text,
+					media_ids: new Array(image.media_id_string)
+				}, (err, data, response) => {
+					if (err){
+						console.log('error:', err);
+					}
+				});
+			});
+		}
+	});
+}
+// Run the uploadRandomImage() method
+uploadRandomImage();
+// Set interval to once an hour
+setInterval(uploadRandomImage, 1000 * 60 * 60);
 
 
 // This is the URL of a search for the latest tweets on the '#artwork' hashtag.
