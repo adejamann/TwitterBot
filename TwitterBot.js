@@ -167,30 +167,32 @@ function artworkFollow() {
 		count: 10,
 		result_type: "recent" //looking for recent users.
 	};
-	T.get('search/tweets', artworkSearch, function(error, data) { 
-		if (err !== null) { //checks for error
-			console.log('There is an error: ', err);
-		  }
-		  else {
-		  	var sn = reply.pick().user.screen_name;
-			if (debug) 
-				console.log(sn);
-			else {
-				//Now follow that user
-				T.post('friendships/create', {
-					screen_name: sn 
+	T.get('search/tweets', animationSearch, function(error, data) {
+        // If there is no error, proceed
+        if (!error) {
+
+            for (let i = 0; i < data.statuses.length; i++) {
+                // Get the screen_name 
+                let screen_name = data.statuses[i].user.screen_name;
+
+
+                // Follow that user
+                T.post('friendships/create', {
+                    screen_name
                 }, function(err, response) {
                     if (err) {
-                        console.log('There was an error: ', err);
+                        console.log('There was an error with Twitter: ', err);
                     } else {
-                        console.log(screen_name, ': Following' + sn); //successfully followed!
+                        console.log(screen_name, ': Following'); //successfully followed!
                     }
-				});
-			}
-		}
-	});
+                });
+            }
+        } else {
+            console.log('There was an error: ', error);
+        }
+    })
 }
-
+	
 
 function runBot() {
 	console.log(" "); // just for legible logs
