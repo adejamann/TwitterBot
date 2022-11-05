@@ -15,6 +15,7 @@ var WordnikAPIKey = 'd9776ttsyoaffi5hplh66ud2us6ipfuso1thwwe0mv3nvfpxd';
 var request = require('request');
 var inflection = require('inflection');
 var awesome;
+var motivate;
 
 var pre;	// store prebuilt strings here.
 
@@ -102,89 +103,25 @@ function likepost() {
 	});
 }
 
-const randomFromArray = (arr) => {
-    /* Helper function for picking a random item from an array. */
+//Post a tweet encouraging other artist
+function tweet() {
 
-    return arr[Math.floor(Math.random() * arr.length)];
+    var tweetText = motivate.pick(); 
+
+    if (debug)
+        console.log('Debug mode: ', tweetText); //will not post it on twitter
+    else
+        T.post('statuses/update', { //will post a status
+            status: tweetText
+        }, function(err, reply) {
+            if (err != null) {
+                console.log('Error: ', err); // in the case something goes wrong with the status update
+            } else {
+                console.log('Tweeted: ', tweetText); //successful tweet!
+            }
+        });
 }
 
-const tweetRandomImage = () => {
-    /* First, read the content of the images folder. */
-
-    fs.readdir(__dirname + '/images', (err, files) => {
-        if (err){
-            console.log('error:', err);
-            return;
-        } else {
-            let images = [];
-
-            files.forEach((f) => {
-                images.push(f);
-            });
-
-            /* Then pick a random image. */
-
-            console.log('opening an image...');
-
-            const imagePath = path.join(__dirname, '/images/' + randomFromArray(images)),
-                  imageData = fs.readFileSync(imagePath, { encoding: 'base64' });
-
-            /* Upload the image to Twitter. */
-
-            console.log('uploading an image...', imagePath);
-
-            T.post('media/upload', { media_data: imageData }, (err, data, response) => {
-                if (err){
-                    console.log('error:', err);
-                } else {
-                    /* Add image description. */
-                    
-                    const image = data;
-                    console.log('image uploaded, adding description...');
-
-                    T.post('media/metadata/create', {
-                        media_id: image.media_id_string,
-                        alt_text: {
-                            text: 'Describe the image'
-                        }            
-                    }, (err, data, response) => {
-
-                        /* And finally, post a tweet with the image. */
-
-                        T.post('statuses/update', {
-                            // status: 'Optional tweet text.',
-                            media_ids: [image.media_id_string]
-                        },
-                        (err, data, response) => {
-                            if (err){
-                                console.log('error:', err);
-                            } else {
-                                console.log('posted an image!');
-
-                                /*
-                                    After successfully tweeting, we can delete the image.
-                                    Keep this part commented out if you want to keep the image and reuse it later.
-                                */
-
-                                // fs.unlink(imagePath, (err) => {
-                                //   if (err){
-                                //     console.log('error: unable to delete image ' + imagePath);
-                                //   } else {
-                                //     console.log('image ' + imagePath + ' was deleted');
-                                //   }
-                                // });
-                            }
-                        });
-                    });
-                }
-            });
-        }
-    });
-}
-// Run the uploadRandomImage() method
-uploadRandomImage();
-// Set interval to once an hour
-setInterval(uploadRandomImage, 1000 * 60 * 30);
 
 
 //Reply someone's post under #artwork
@@ -231,7 +168,7 @@ function artworkFollow() {
 		result_type: "recent" //looking for recent users.
 	};
 	T.get('search/tweets', artworkSearch, function(error, data) { 
-		if (error !== null) { //checks for error
+		if (err !== null) { //checks for error
 			console.log('There is an error: ', err);
 		  }
 		  else {
@@ -277,6 +214,13 @@ function runBot() {
 			}				
 		}
 
+		motivate = [
+
+            "Dear artist, you are all " + adjective[0].words.pick() + " and your work is " + adjective[0].words.pick() + " so never give up!"
+
+        ];
+
+
 		pre = [
 
 			"This piece of artwork is so " + adjective[0].words.pick() + ".", 
@@ -298,15 +242,15 @@ function runBot() {
 
 		if (rand <= 2) {
 		console.log("-------Post an image");
-		uploadRandomImage();
+		artworkFollow();
 
 		} else if (rand <= 4) {
 		console.log("-------Retweet something in #artwork");
-		retweetLatest();
+		artworkFollow();
 
 		} else if (rand <= 6) {
 		console.log("-------Like something if word artwork is in the tweet");
-		likepost();
+		artworkFollow();
 
 		} else if (rand <= 8) {
 		console.log("-------Follow someone under #artwork hashtag");
@@ -314,7 +258,7 @@ function runBot() {
 
 		} else {
 		console.log("-------Reply someone's post under #artwork hashtag");
-		artworkReply();
+		artworkFollow();
 		}
 	});
 }
