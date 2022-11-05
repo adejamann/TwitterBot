@@ -178,12 +178,12 @@ function artworkFollow() {
 			else {
 				//Now follow that user
 				T.post('friendships/create', {
-					screen_name
+					screen_name: sn 
                 }, function(err, response) {
                     if (err) {
                         console.log('There was an error: ', err);
                     } else {
-                        console.log(screen_name, ': Following'); //successfully followed!
+                        console.log(screen_name, ': Following' + sn); //successfully followed!
                     }
 				});
 			}
